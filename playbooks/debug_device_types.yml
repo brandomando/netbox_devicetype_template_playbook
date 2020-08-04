@@ -5,50 +5,53 @@
     connection: local
     collections:
       - netbox.netbox
+
     tasks:
 
-    # - name: "Gather list of files in Cisco folder"
-    #   find:
-    #     paths:
-    #       - "../devicetype-library/device-types/Cisco/"
-    #   register: template_files
+    - name: "Gather list of files in Cisco folder"
+      find:
+        paths:
+          - "../devicetype-library/device-types/Cisco/"
+      register: template_files
     
-    # - name: "Refactor template_files"
-    #   set_fact: template_files="{{ template_files.files | map(attribute='path') | list }}"
+    - name: "Gather filenames from template_files folder"
+      set_fact: template_files="{{ template_files.files | map(attribute='path') | list }}"
 
-    # - name: "Second Refactor of template_files names"
-    #   set_fact:
-    #     template_files: "{{ item.split('/')[-1].split('.')[0] }}"
-    #   with_items:
-    #     - "{{ template_files }}"
-
-    # - name: "Debug template_files"
-    #   debug: var=template_files
-
-    - name: "Pull variables from a static yml file in another dir"
+    - name: "Get device_type vars from yaml files"
       include_vars:
-        file: ../devicetype-library/device-types/Cisco/asr1002-hx.yaml
-        name: asr1002_hx
+        file: "{{ item }}"
+        name: "{{ item | regex_replace('.*/(.*).(?:yaml)$', '\\1')}}"
+      with_items: "{{ template_files }}"
+      register: templates
 
-    - name: "Debugging variables pulled from the yml file"
-      debug: 
-        var: asr1002_hx
+    - name: "Cleanup templates tree"
+      set_fact:
+        templates: "{{ templates.results | map(attribute='ansible_facts') | list }}"
+  
+    - name: "Create set of manufacturers"
+      set_fact: manufacturers="{{ item.values() | map(attribute='manufacturer') | list }}"
+      with_items: "{{ templates }}"
 
     - name: "Add manufacturer to Netbox"
       netbox_manufacturer:
         netbox_url: http://localhost:8000
         netbox_token: "{{ lookup('env', 'nb_token') }}"
         data:
-          name: "{{ asr1002_hx.manufacturer }}"
-  
+          name: "{{ item }}"
+      with_items: "{{ manufacturers }}"
+
     - name: "Build device template in Netbox"
       netbox_device_type:
         netbox_url: http://localhost:8000
         netbox_token: "{{ lookup('env', 'nb_token') }}"
         data:
-          manufacturer: "{{ asr1002_hx.manufacturer }}"
-          model: "{{ asr1002_hx.model }}"
-          slug: "{{ asr1002_hx.slug }}"
-          u_height: "{{ asr1002_hx.u_height }}"
-          is_full_depth: "{{ asr1002_hx.is_full_depth }}"
+          manufacturer: "{{ item.values()[0]['manufacturer'] }}"
+          model: "{{ item.values()[0]['model'] }}"
+          slug: "{{ item.values()[0]['slug'] }}"
+          u_height: "{{ item.values()[0]['u_height'] if defined | default(false) else omit  }}"
+          is_full_depth: "{{ item.values()[0]['is_full_depth'] if defined | default(false) else omit }}"
         state: present
+      with_items: "{{ templates }}"
+
+    - name: "**** PLACEHOLDER FOR NEXT STEPS ****"
+      debug: msg="Add task to add interface templates to device type profiles"
