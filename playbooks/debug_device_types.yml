@@ -34,7 +34,6 @@
   
     - name: "Create set of manufacturers"
       set_fact: manufacturers="{{ item.values() | map(attribute='manufacturer') | list | unique }}"
-      list(set(list(map(attribute('manufacturer'), item.values())))
       with_items: "{{ templates }}"
 
     - name: "Add manufacturer to Netbox"
@@ -59,4 +58,6 @@
       with_items: "{{ templates }}"
 
     - name: "**** PLACEHOLDER FOR NEXT STEPS ****"
-      debug: msg="Add task to add interface templates to device type profiles"
+      debug: msg="{{ item }}"
+      with_items: "{{ item.values()[0]['interfaces'] }}"
+      
