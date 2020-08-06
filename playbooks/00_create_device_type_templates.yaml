@@ -1,0 +1,70 @@
+- name: Build Netbox device-types and interface templates
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  collections:
+    - netbox.netbox
+
+  vars:
+    netbox_url: "{{ lookup('env', 'nb_url') }}"
+    netbox_token: "{{ lookup('env', 'nb_token') }}"
+    manufacturers: []
+    interfaces: []
+
+  tasks:
+
+  - name: "Gather list of files in Cisco folder"
+    find:
+      paths:
+        - "../devicetype-library/device-types/Cisco/"
+    register: template_files
+  
+  - name: "Gather filenames from template_files folder"
+    set_fact: template_files="{{ template_files.files | map(attribute='path') | list }}"
+
+  - name: "Get device_type vars from yaml files"
+    include_vars:
+      file: "{{ item }}"
+    with_items: "{{ template_files }}"
+    register: templates
+
+  - name: "Cleanup templates tree"
+    set_fact:
+      templates: "{{ templates.results | map(attribute='ansible_facts') | list }}"
+
+  # - name: "Create set of manufacturers"
+  #   set_fact: manufacturers="{{ manufacturers + [item['manufacturer']] }}"
+  #   with_items: "{{ templates }}"
+  #   loop_control:
+  #     label: "{{ item['model'] }}"
+    
+  # - name: Deduplicate manufacturers list
+  #   set_fact: manufacturers="{{ manufacturers | unique }}"
+  
+  # - name: "Add manufacturer to Netbox"
+  #   netbox_manufacturer:
+  #     netbox_url: "{{ netbox_url }}"
+  #     netbox_token: "{{ netbox_token }}"
+  #     data:
+  #       name: "{{ item }}"
+  #   with_items: "{{ manufacturers }}"
+
+  # - name: "Build device template in Netbox"
+  #   netbox_device_type:
+  #     netbox_url: "{{ netbox_url }}"
+  #     netbox_token: "{{ netbox_token }}"
+  #     data:
+  #       manufacturer: "{{ item['manufacturer'] }}"
+  #       model: "{{ item['model'] }}"
+  #       slug: "{{ item['slug'] }}"
+  #       u_height: "{{ item['u_height'] if defined | default(false) else omit  }}"
+  #       is_full_depth: "{{ item['is_full_depth'] if defined | default(false) else omit }}"
+  #     state: present
+  #   with_items: "{{ templates }}"
+  #   loop_control:
+  #     label: "{{ item['model'] }}"
+
+  - name: "Build interface templates on devices"
+    include_tasks: 01_create_interface_templates.yaml
+    with_items: "{{ templates }}"
+    when: item['interfaces'] is defined
