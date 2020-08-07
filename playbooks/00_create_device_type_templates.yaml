@@ -8,21 +8,30 @@
   vars:
     netbox_url: "{{ lookup('env', 'nb_url') }}"
     netbox_token: "{{ lookup('env', 'nb_token') }}"
+    template_root: "{{ rootdir | default('../device_type_templates') }}"
+    vendors: []
     manufacturers: []
     interfaces: []
 
   tasks:
 
-  - name: "Gather list of files in Cisco folder"
+  - name: "Find files reccursively in root diretory {{ template_root }}"
     find:
       paths:
-        - "../devicetype-library/device-types/Cisco/"
+        - "{{ template_root }}"
+      patterns:
+        - ".*\\.yml"
+        - ".*\\.yaml"
+      file_type: file
+      use_regex: yes
+      recurse: yes
+      depth: 1
     register: template_files
   
-  - name: "Gather filenames from template_files folder"
+  - name: "Parse file data for filenames from directory"
     set_fact: template_files="{{ template_files.files | map(attribute='path') | list }}"
 
-  - name: "Get device_type vars from yaml files"
+  - name: "Get templates vars from imported files"
     include_vars:
       file: "{{ item }}"
     with_items: "{{ template_files }}"
@@ -41,7 +50,7 @@
   - name: Deduplicate manufacturers list
     set_fact: manufacturers="{{ manufacturers | unique }}"
   
-  - name: "Add manufacturer to Netbox"
+  - name: "Add manufacturers to Netbox"
     netbox_manufacturer:
       netbox_url: "{{ netbox_url }}"
       netbox_token: "{{ netbox_token }}"
@@ -64,6 +73,6 @@
     loop_control:
       label: "{{ item['model'] }}"
 
-  - name: "Build interface templates on devices"
+  - name: "Build component templates on device templates"
     include_tasks: 01_create_device_component_templates.yaml
     with_items: "{{ templates }}"

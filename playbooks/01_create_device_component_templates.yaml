@@ -15,7 +15,7 @@
     label: "{{ item['model'] }}\t{{ interface['name'] }}"
 
 - name: Create power port templates for  device template of {{ item['manufacturer'] }} {{ item['model']}}
-  netbox_console_port_template:
+  netbox_power_port_template:
     netbox_url: "{{ netbox_url }}"
     netbox_token: "{{ netbox_token }}"
     data:
