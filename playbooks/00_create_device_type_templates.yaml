@@ -65,6 +65,5 @@
       label: "{{ item['model'] }}"
 
   - name: "Build interface templates on devices"
-    include_tasks: 01_create_interface_templates.yaml
+    include_tasks: 01_create_device_component_templates.yaml
     with_items: "{{ templates }}"
-    when: item['interfaces'] is defined

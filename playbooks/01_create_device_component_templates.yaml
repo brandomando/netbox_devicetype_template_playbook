@@ -1,0 +1,45 @@
+- name: Create interface templates for device template of {{ item['manufacturer'] }} {{ item['model']}}
+  netbox_device_interface_template:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
+    data:
+      device_type: "{{ item['slug'] }}"
+      name: "{{ interface['name'] }}"
+      type: "{{ interface['type'] }}"
+      mgmt_only: "{{ interface['mgmt_only']  | default(false) }}"
+    state: present
+  with_items: "{{ item['interfaces'] }}"
+  when: item['interfaces'] is defined
+  loop_control:
+    loop_var: interface
+    label: "{{ item['model'] }}\t{{ interface['name'] }}"
+
+- name: Create power port templates for  device template of {{ item['manufacturer'] }} {{ item['model']}}
+  netbox_console_port_template:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
+    data:
+      name: "{{ power_port['name'] }}"
+      device_type: "{{ item['slug'] }}"
+      type: "{{ power_port['type'] if defined | default(false) else omit }}"
+    state: present
+  with_items: "{{ item['power-ports'] }}"
+  when: item['power-ports'] is defined
+  loop_control:
+    loop_var: power_port
+    label: "{{ item['model'] }}\t{{ power_port['name'] }}"
+
+- name: Create console port templates for device template of {{ item['manufacturer'] }} {{ item['model']}}
+  netbox_console_port_template:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
+    data:
+      name: "{{ console_port['name'] }}"
+      device_type: "{{ item['slug'] }}"
+      type: "{{ console_port['type'] if defined | default(false) else omit }}"
+    state: present
+  with_items: "{{ item['console-ports'] }}"
+  when: item['console-ports'] is defined
+  loop_control:
+    loop_var: console_port
+    label: "{{ item['model'] }}\t{{ console_port['name'] }}"
