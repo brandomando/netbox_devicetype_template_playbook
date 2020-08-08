@@ -1,5 +1,5 @@
 */hosts.yml
 
+!device_type_templates/.gitkeep
 device_type_templates/*
 
-!device_type_templates/.gitkeep
