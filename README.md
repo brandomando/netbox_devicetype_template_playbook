@@ -13,6 +13,8 @@ YAML models of devices using the format found in the devicetype-library [found h
 
 Place YAML files in the `device_type_templates` directory at the root of this package. The playbook will search recursively one directory deep, so you can nest the template files in a subdirectory of that root. Alternatively, you can use the `--extra-vars` when you run the playbook and specify the parameter `rootdir` to an absolute path of the directory that you place your templates.
 
+From the root of this package, run `ansible-playbook playbooks/00_create_device_type_templates.yaml`
+
 ## License
 
 [MIT License](https://choosealicense.com/licenses/mit/)
