@@ -1,3 +1,13 @@
+#######################################################################################################
+# Creates device templates with components using YAML file inputs formatted like those found at:
+# https://github.com/netbox-community/devicetype-library
+#
+# Author: Brandon Donohoe
+# Github: https://github.com/brandomando
+#
+#######################################################################################################
+
+
 - name: Build Netbox device-types and interface templates
   hosts: localhost
   gather_facts: false
