@@ -1,3 +1,13 @@
+#######################################################################################################
+# Tasks for adding subcomponents to device templates in Netbox
+#
+# Author: Brandon Donohoe
+# Github: https://github.com/brandomando
+#
+#######################################################################################################
+
+
+
 - name: Create interface templates for device template of {{ item['manufacturer'] }} {{ item['model']}}
   netbox_device_interface_template:
     netbox_url: "{{ netbox_url }}"
