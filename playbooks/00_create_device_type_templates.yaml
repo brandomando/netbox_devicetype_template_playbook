@@ -35,7 +35,7 @@
       file_type: file
       use_regex: yes
       recurse: yes
-      depth: 1
+      depth: 2
     register: template_files
   
   - name: "Parse file data for filenames from directory"
