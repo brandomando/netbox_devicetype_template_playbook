@@ -6,23 +6,35 @@
 #
 #######################################################################################################
 
-
-
-- name: Create interface templates for device template of {{ item['manufacturer'] }} {{ item['model']}}
-  netbox_device_interface_template:
+- name: Create console port templates for device template of {{ item['manufacturer'] }} {{ item['model']}}
+  netbox_console_port_template:
     netbox_url: "{{ netbox_url }}"
     netbox_token: "{{ netbox_token }}"
     data:
+      name: "{{ console_port['name'] }}"
       device_type: "{{ item['slug'] }}"
-      name: "{{ interface['name'] }}"
-      type: "{{ interface['type'] }}"
-      mgmt_only: "{{ interface['mgmt_only']  | default(false) }}"
+      type: "{{ console_port['type'] if defined | default(false) else omit }}"
     state: present
-  with_items: "{{ item['interfaces'] }}"
-  when: item['interfaces'] is defined
+  with_items: "{{ item['console-ports'] }}"
+  when: item['console-ports'] is defined
   loop_control:
-    loop_var: interface
-    label: "{{ item['model'] }}\t{{ interface['name'] }}"
+    loop_var: console_port
+    label: "{{ item['model'] }}\t{{ console_port['name'] }}"
+
+- name: Create console server port templates for device template of {{ item['manufacturer'] }} {{ item['model'] }}
+  netbox_console_server_port_template:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
+    data:
+      name: "{{ console_server_port['name'] }}"
+      device_type: "{{ item['slug'] }}"
+      type: "{{ console_server_port['type'] | default(omit) }}"
+    state: present
+  with_items: "{{ item['console-server-ports'] }}"
+  when: item['console-server-ports'] is defined
+  loop_control:
+    loop_var: console_server_port
+    label: "{{ item['model'] }}\t{{ console_server_port['name'] }}"
 
 - name: Create power port templates for  device template of {{ item['manufacturer'] }} {{ item['model']}}
   netbox_power_port_template:
@@ -39,17 +51,82 @@
     loop_var: power_port
     label: "{{ item['model'] }}\t{{ power_port['name'] }}"
 
-- name: Create console port templates for device template of {{ item['manufacturer'] }} {{ item['model']}}
-  netbox_console_port_template:
+- name: Create power outlet templates for  device template of {{ item['manufacturer'] }} {{ item['model']}}
+  netbox_power_outlet_template:
     netbox_url: "{{ netbox_url }}"
     netbox_token: "{{ netbox_token }}"
     data:
-      name: "{{ console_port['name'] }}"
+      name: "{{ power_outlet['name'] }}"
       device_type: "{{ item['slug'] }}"
-      type: "{{ console_port['type'] if defined | default(false) else omit }}"
+      type: "{{ power_outlet['type'] if defined | default(false) else omit }}"
+      power_port: "{{ power_outlet['power_port'] | default(omit) }}"
+      feed_leg: "{{ power_outlet['feed_leg'] | default(omit) }}"
     state: present
-  with_items: "{{ item['console-ports'] }}"
-  when: item['console-ports'] is defined
+  with_items: "{{ item['power-outlets'] }}"
+  when: item['power-outlets'] is defined
   loop_control:
-    loop_var: console_port
-    label: "{{ item['model'] }}\t{{ console_port['name'] }}"
+    loop_var: power_outlet
+    label: "{{ item['model'] }}\t{{ power_outlet['name'] }}"
+  
+- name: Create interface templates for device template of {{ item['manufacturer'] }} {{ item['model']}}
+  netbox_device_interface_template:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
+    data:
+      device_type: "{{ item['slug'] }}"
+      name: "{{ interface['name'] }}"
+      type: "{{ interface['type'] }}"
+      mgmt_only: "{{ interface['mgmt_only']  | default(false) }}"
+    state: present
+  with_items: "{{ item['interfaces'] }}"
+  when: item['interfaces'] is defined
+  loop_control:
+    loop_var: interface
+    label: "{{ item['model'] }}\t{{ interface['name'] }}"
+    
+- name: Create rear-port templates for device template of {{ item['manufacturer'] }} {{ item['model']}}
+  netbox_rear_port_template:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
+    data:
+      device_type: "{{ item['slug'] }}"
+      name: "{{ rear_port['name'] }}"
+      type: "{{ rear_port['type'] }}"
+      positions: "{{ rear_port['positions']  | default(false) }}"
+    state: present
+  with_items: "{{ item['rear-ports'] }}"
+  when: item['rear-ports'] is defined
+  loop_control:
+    loop_var: rear_port
+    label: "{{ item['model'] }}\t{{ rear_port['name'] }}"
+
+- name: Create front-port templates for device template of {{ item['manufacturer'] }} {{ item['model']}}
+  netbox_front_port_template:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
+    data:
+      device_type: "{{ item['slug'] }}"
+      name: "{{ front_port['name'] }}"
+      type: "{{ front_port['type'] }}"
+      rear_port_template: "{{ front_port['rear_port'] }}"
+      rear_port_template_position: "{{ front_port['rear_port_position'] | default(omit) }}"
+    state: present
+  with_items: "{{ item['front-ports'] }}"
+  when: item['front-ports'] is defined
+  loop_control:
+    loop_var: front_port
+    label: "{{ item['model'] }}\t{{ front_port['name'] }}"
+
+- name: Create device-bay templates for device template of {{ item['manufacturer'] }} {{ item['model']}}
+  netbox_device_bay_template:
+    netbox_url: "{{ netbox_url }}"
+    netbox_token: "{{ netbox_token }}"
+    data:
+      device_type: "{{ item['slug'] }}"
+      name: "{{ device_bay['name'] }}"
+    state: present
+  with_items: "{{ item['device-bays'] }}"
+  when: item['device-bays'] is defined
+  loop_control:
+    loop_var: device_bay
+    label: "{{ item['model'] }}\t{{ device_bay['name'] }}"
