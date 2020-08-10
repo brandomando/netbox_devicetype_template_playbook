@@ -16,15 +16,14 @@
     - netbox.netbox
 
   vars:
-    netbox_url: "{{ lookup('env', 'nb_url') }}"
-    netbox_token: "{{ lookup('env', 'nb_token') }}"
-    template_root: "{{ rootdir | default('../device_type_templates') }}"
+    netbox_url: "{{ nb_url | default(lookup('env', 'nb_url')) }}"
+    netbox_token: "{{ nb_token | lookup('env', 'nb_token') }}"
+    template_root: "{{ template_root | default('../device_type_templates') }}"
     vendors: []
     manufacturers: []
     interfaces: []
 
   tasks:
-
   - name: "Find files reccursively in root diretory {{ template_root }}"
     find:
       paths:
