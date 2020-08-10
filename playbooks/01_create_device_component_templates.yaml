@@ -6,7 +6,7 @@
 #
 #######################################################################################################
 
-- name: Create console port templates for device template of {{ item['manufacturer'] }} {{ item['model']}}
+- name: "Create console port templates for device template of {{ item['manufacturer'] }} {{ item['model']}}"
   netbox_console_port_template:
     netbox_url: "{{ netbox_url }}"
     netbox_token: "{{ netbox_token }}"
@@ -21,7 +21,7 @@
     loop_var: console_port
     label: "{{ item['model'] }}\t{{ console_port['name'] }}"
 
-- name: Create console server port templates for device template of {{ item['manufacturer'] }} {{ item['model'] }}
+- name: "Create console server port templates for device template of {{ item['manufacturer'] }} {{ item['model'] }}"
   netbox_console_server_port_template:
     netbox_url: "{{ netbox_url }}"
     netbox_token: "{{ netbox_token }}"
@@ -36,7 +36,7 @@
     loop_var: console_server_port
     label: "{{ item['model'] }}\t{{ console_server_port['name'] }}"
 
-- name: Create power port templates for  device template of {{ item['manufacturer'] }} {{ item['model']}}
+- name: "Create power port templates for  device template of {{ item['manufacturer'] }} {{ item['model']}}"
   netbox_power_port_template:
     netbox_url: "{{ netbox_url }}"
     netbox_token: "{{ netbox_token }}"
@@ -51,7 +51,7 @@
     loop_var: power_port
     label: "{{ item['model'] }}\t{{ power_port['name'] }}"
 
-- name: Create power outlet templates for  device template of {{ item['manufacturer'] }} {{ item['model']}}
+- name: "Create power outlet templates for  device template of {{ item['manufacturer'] }} {{ item['model']}}"
   netbox_power_outlet_template:
     netbox_url: "{{ netbox_url }}"
     netbox_token: "{{ netbox_token }}"
@@ -68,7 +68,7 @@
     loop_var: power_outlet
     label: "{{ item['model'] }}\t{{ power_outlet['name'] }}"
   
-- name: Create interface templates for device template of {{ item['manufacturer'] }} {{ item['model']}}
+- name: "Create interface templates for device template of {{ item['manufacturer'] }} {{ item['model']}}"
   netbox_device_interface_template:
     netbox_url: "{{ netbox_url }}"
     netbox_token: "{{ netbox_token }}"
@@ -84,7 +84,7 @@
     loop_var: interface
     label: "{{ item['model'] }}\t{{ interface['name'] }}"
     
-- name: Create rear-port templates for device template of {{ item['manufacturer'] }} {{ item['model']}}
+- name: "Create rear-port templates for device template of {{ item['manufacturer'] }} {{ item['model']}}"
   netbox_rear_port_template:
     netbox_url: "{{ netbox_url }}"
     netbox_token: "{{ netbox_token }}"
@@ -100,7 +100,7 @@
     loop_var: rear_port
     label: "{{ item['model'] }}\t{{ rear_port['name'] }}"
 
-- name: Create front-port templates for device template of {{ item['manufacturer'] }} {{ item['model']}}
+- name: "Create front-port templates for device template of {{ item['manufacturer'] }} {{ item['model']}}"
   netbox_front_port_template:
     netbox_url: "{{ netbox_url }}"
     netbox_token: "{{ netbox_token }}"
@@ -117,7 +117,7 @@
     loop_var: front_port
     label: "{{ item['model'] }}\t{{ front_port['name'] }}"
 
-- name: Create device-bay templates for device template of {{ item['manufacturer'] }} {{ item['model']}}
+- name: "Create device-bay templates for device template of {{ item['manufacturer'] }} {{ item['model']}}"
   netbox_device_bay_template:
     netbox_url: "{{ netbox_url }}"
     netbox_token: "{{ netbox_token }}"

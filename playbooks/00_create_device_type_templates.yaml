@@ -8,7 +8,7 @@
 #######################################################################################################
 
 
-- name: Build Netbox device-types and interface templates
+- name: "Build Netbox device-types and interface templates"
   hosts: localhost
   gather_facts: false
   connection: local
@@ -19,10 +19,8 @@
   # and netbox_token as well as template_root. Default is environment vars
   vars:
     netbox_url: "{{ nb_url | default(lookup('env', 'nb_url')) }}"
-    netbox_token: "{{ nb_token | lookup('env', 'nb_token') }}"
+    netbox_token: "{{ nb_token | default(lookup('env', 'nb_token')) }}"
     template_root: "{{ template_root | default('../devicetype-library/device-types/') }}"
-    vendors: []
-    manufacturers: []
     interfaces: []
 
   tasks:
@@ -53,12 +51,14 @@
       templates: "{{ templates.results | map(attribute='ansible_facts') | list }}"
 
   - name: "Create set of manufacturers"
+    vars:
+      manufacturers: []
     set_fact: manufacturers="{{ manufacturers + [item['manufacturer']] }}"
     with_items: "{{ templates }}"
     loop_control:
       label: "{{ item['model'] }}"
     
-  - name: Deduplicate manufacturers list
+  - name: "Deduplicate manufacturers list"
     set_fact: manufacturers="{{ manufacturers | unique }}"
   
   - name: "Add manufacturers to Netbox"
