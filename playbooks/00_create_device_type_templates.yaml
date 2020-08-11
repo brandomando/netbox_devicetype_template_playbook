@@ -20,7 +20,7 @@
   vars:
     netbox_url: "{{ nb_url | default(lookup('env', 'nb_url')) }}"
     netbox_token: "{{ nb_token | default(lookup('env', 'nb_token')) }}"
-    template_root: "{{ template_root | default('../devicetype-library/device-types/') }}"
+    template_root: "{{ template_dir | default('../devicetype-library/device-types/') }}"
 
   tasks:
   - name: "Find files reccursively in root diretory {{ template_root }}"
